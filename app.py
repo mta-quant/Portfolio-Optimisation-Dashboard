@@ -385,7 +385,7 @@ def sidebar_inputs():
             "Maximum Weight per Asset (%)",
             min_value=10,
             max_value=100,
-            value=40,
+            value=100,
             step=5,
             help="Maximum allocation to a single asset"
         ) / 100
