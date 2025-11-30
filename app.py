@@ -451,7 +451,7 @@ def display_header():
     st.markdown('<div class="main-header">Modern Portfolio Theory Dashboard</div>', unsafe_allow_html=True)
     st.markdown("""
     <div style="text-align: center; margin-bottom: 2rem;">
-        Advanced portfolio optimisation and risk analysis tool showcasing quantitative finance expertise.
+        Advanced portfolio optimisation and risk analysis tool.
     </div>
     """, unsafe_allow_html=True)
 
@@ -1410,9 +1410,8 @@ def main():
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; padding: 1rem;">
-        Modern Portfolio Theory Dashboard | Built with Python, Streamlit, and cvxpy<br>
-        Showcasing quantitative finance and portfolio optimisation expertise
-    </div>
+        Modern Portfolio Theory Dashboard | Built with Streamlit<br>
+=    </div>
     """, unsafe_allow_html=True)
 
 
