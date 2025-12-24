@@ -242,25 +242,88 @@ def validate_tickers(tickers: List[str]) -> Tuple[List[str], List[str]]:
     """
     Validate that tickers exist and can be downloaded.
 
+    If a ticker is invalid, automatically tries common exchange suffixes
+    (e.g., .L, .AQ, .PA) and returns the corrected ticker if found.
+
     Args:
         tickers: List of ticker symbols to validate
 
     Returns:
         Tuple of (valid_tickers, invalid_tickers)
+        Note: valid_tickers may contain corrected tickers with exchange suffixes
     """
+    # Common Yahoo Finance exchange suffixes
+    EXCHANGE_SUFFIXES = [
+        '.L',    # London Stock Exchange
+        '.AQ',   # Euronext Amsterdam (Alternative)
+        '.AS',   # Euronext Amsterdam
+        '.PA',   # Euronext Paris
+        '.DE',   # XETRA (Germany)
+        '.F',    # Frankfurt Stock Exchange
+        '.MI',   # Milan Stock Exchange
+        '.SW',   # Swiss Exchange
+        '.TO',   # Toronto Stock Exchange
+        '.V',    # TSX Venture Exchange
+        '.AX',   # Australian Securities Exchange
+        '.NZ',   # New Zealand Exchange
+        '.HK',   # Hong Kong Stock Exchange
+        '.T',    # Tokyo Stock Exchange
+        '.KS',   # Korea Stock Exchange
+        '.KQ',   # KOSDAQ (Korea)
+        '.SA',   # Brazil (Sao Paulo)
+        '.MX',   # Mexico Stock Exchange
+        '.ST',   # Stockholm (Nasdaq Nordic)
+        '.OL',   # Oslo Stock Exchange
+        '.CO',   # Copenhagen Stock Exchange
+        '.HE',   # Helsinki Stock Exchange
+        '.IC',   # Iceland Stock Exchange
+        '.LS',   # Lisbon Stock Exchange
+        '.AT',   # Athens Stock Exchange
+        '.PR',   # Prague Stock Exchange
+        '.WA',   # Warsaw Stock Exchange
+        '.IS',   # Istanbul Stock Exchange
+        '.JK',   # Jakarta Stock Exchange
+        '.KL',   # Kuala Lumpur Stock Exchange
+        '.SI',   # Singapore Exchange
+        '.BK',   # Bangkok Stock Exchange
+        '.TW',   # Taiwan Stock Exchange
+    ]
+
     valid = []
     invalid = []
 
     for ticker in tickers:
+        # First try the ticker as-is
         try:
             stock = yf.Ticker(ticker)
-            # Try to get some basic info
             hist = stock.history(period='5d')
             if not hist.empty:
                 valid.append(ticker)
-            else:
-                invalid.append(ticker)
+                continue
         except:
+            pass
+
+        # If original ticker failed, try with common exchange suffixes
+        found_valid = False
+        for suffix in EXCHANGE_SUFFIXES:
+            # Skip if ticker already has a suffix
+            if '.' in ticker:
+                break
+
+            test_ticker = ticker + suffix
+            try:
+                stock = yf.Ticker(test_ticker)
+                hist = stock.history(period='5d')
+                if not hist.empty:
+                    valid.append(test_ticker)
+                    found_valid = True
+                    # Show user the corrected ticker
+                    st.info(f"Ticker '{ticker}' corrected to '{test_ticker}'")
+                    break
+            except:
+                continue
+
+        if not found_valid:
             invalid.append(ticker)
 
     return valid, invalid

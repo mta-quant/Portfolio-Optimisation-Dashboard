@@ -470,6 +470,9 @@ def load_and_process_data(config):
         # Validate tickers
         valid_tickers, invalid_tickers = data.validate_tickers(config['tickers'])
 
+        # Update config with corrected tickers (may include exchange suffixes)
+        config['tickers'] = valid_tickers
+
         if invalid_tickers:
             st.warning(f" Invalid tickers removed: {', '.join(invalid_tickers)}")
 
@@ -1353,6 +1356,9 @@ def main():
 
     # Load data
     price_data, returns_data, current_prices = load_and_process_data(config)
+
+    # Update session state with corrected tickers (may include exchange suffixes)
+    st.session_state.config = config
 
     if price_data is None or returns_data is None:
         st.stop()
