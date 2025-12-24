@@ -473,6 +473,10 @@ def load_and_process_data(config):
         # Update config with corrected tickers (may include exchange suffixes)
         config['tickers'] = valid_tickers
 
+        # Also update session state tickers list to persist corrections
+        st.session_state.tickers_list = valid_tickers
+        update_url_params()
+
         if invalid_tickers:
             st.warning(f" Invalid tickers removed: {', '.join(invalid_tickers)}")
 
@@ -517,6 +521,25 @@ def load_and_process_data(config):
 
         # Calculate returns
         returns_data = data.calculate_returns(price_data, method='log')
+
+        # Check if returns data is empty
+        if returns_data.empty or len(returns_data) == 0:
+            st.error(f"""
+            **Insufficient data for analysis**
+
+            After processing, no valid return data was found for the selected tickers and date range.
+
+            **Possible causes:**
+            - Date range is too short (need at least 2 data points)
+            - Tickers have no overlapping trading dates
+            - Data quality issues with the selected tickers
+
+            **Try:**
+            - Selecting a longer date range (e.g., at least 1 year)
+            - Using more actively traded tickers
+            - Checking if all tickers have data for the selected period
+            """)
+            return None, None, None
 
         # Get current prices
         current_prices = data.get_current_prices(valid_tickers)
